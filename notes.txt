@@ -1,0 +1,8 @@
+fully quaslified name approach:
+-------------------------------
+
+by using full qualified approch we can create object to the scannner cls without importing the scanner cls here we should mention the total sub directory while creating object to the scanner cls
+    ex:
+	class A{
+		java.util.Scanner sc = new java.util.Scanner(System.in);
+	}

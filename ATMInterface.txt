@@ -1,0 +1,171 @@
+import java.io.*;
+import java.util.*;
+
+class BankAccount {
+    private String accountNumber;
+    private double balance;
+    private ArrayList<Transaction> transactions;
+
+    public BankAccount(String accountNumber, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.balance = initialBalance;
+        this.transactions = new ArrayList<>();
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            transactions.add(new Transaction("Deposit", amount));
+            System.out.println("Deposit successful. New balance: $" + balance);
+        } else {
+            System.out.println("Invalid amount for deposit.");
+        }
+    }
+
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            transactions.add(new Transaction("Withdrawal", amount));
+            System.out.println("Withdrawal successful. New balance: $" + balance);
+        } else {
+            System.out.println("Invalid amount or insufficient funds.");
+        }
+    }
+
+    public ArrayList<Transaction> getTransactions() {
+        return transactions;
+    }
+}
+
+class Transaction {
+    private String type;
+    private double amount;
+    private Date date;
+
+    public Transaction(String type, double amount) {
+        this.type = type;
+        this.amount = amount;
+        this.date = new Date();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    @Override
+    public String toString() {
+        return "Type: " + type + ", Amount: $" + amount + ", Date: " + date;
+    }
+}
+
+public class ATMInterface {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        BankAccount account = new BankAccount("12345", 1000.0);
+
+        System.out.println("Welcome to the ATM!");
+
+        while (true) {
+            System.out.println("\n1. Check Balance");
+            System.out.println("2. Deposit");
+            System.out.println("3. Withdraw");
+            System.out.println("4. View Transactions");
+            System.out.println("5. Exit");
+
+            System.out.print("Enter your choice: ");
+            int choice = getIntInput(scanner);
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Account Balance: $" + account.getBalance());
+                    break;
+                case 2:
+                    System.out.print("Enter the deposit amount: $");
+                    double depositAmount = getDoubleInput(scanner);
+                    account.deposit(depositAmount);
+                    break;
+                case 3:
+                    System.out.print("Enter the withdrawal amount: $");
+                    double withdrawalAmount = getDoubleInput(scanner);
+                    account.withdraw(withdrawalAmount);
+                    break;
+                case 4:
+                    viewTransactions(account);
+                    break;
+                case 5:
+                    saveTransactionsToFile(account);
+                    System.out.println("Thank you for using the ATM!");
+                    scanner.close();
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    public static int getIntInput(Scanner scanner) {
+        int input;
+        while (true) {
+            try {
+                input = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+        return input;
+    }
+
+    public static double getDoubleInput(Scanner scanner) {
+        double input;
+        while (true) {
+            try {
+                input = Double.parseDouble(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+        return input;
+    }
+
+    public static void viewTransactions(BankAccount account) {
+        ArrayList<Transaction> transactions = account.getTransactions();
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions to display.");
+        } else {
+            System.out.println("Transaction History:");
+            for (Transaction transaction : transactions) {
+                System.out.println(transaction);
+            }
+        }
+    }
+
+    public static void saveTransactionsToFile(BankAccount account) {
+        ArrayList<Transaction> transactions = account.getTransactions();
+        try (PrintWriter writer = new PrintWriter(new FileWriter("transactions.txt"))) {
+            for (Transaction transaction : transactions) {
+                writer.println(transaction);
+            }
+            System.out.println("Transactions saved to file.");
+        } catch (IOException e) {
+            System.out.println("Error saving transactions to file: " + e.getMessage());
+        }
+    }
+}
